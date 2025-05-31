@@ -9,10 +9,9 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout your GitHub repo with credentials (replace credentialId accordingly)
                 git(
                     url: 'https://github.com/goldenshine23/flask-app.git',
-                    credentialsId: 'github-pat-credential-id',
+                    credentialsId: 'goldenshine23', // Ensure this ID exists in Jenkins credentials
                     branch: 'main'
                 )
             }
@@ -21,7 +20,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${IMAGE_NAME}")
+                    sh "docker build -t ${IMAGE_NAME} ."
                 }
             }
         }
