@@ -2,20 +2,26 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "chinedudazi/my-image:latest"
+        IMAGE_NAME = 'chinedudazi/my-image'
+        CONTAINER_NAME = 'my-flaskapp'
     }
 
     stages {
-        stage('Clone') {
+        stage('Checkout') {
             steps {
-                git 'https://github.com/your-username/your-repo.git'
+                // Checkout your GitHub repo with credentials (replace credentialId accordingly)
+                git(
+                    url: 'https://github.com/goldenshine23/flask-app.git',
+                    credentialsId: 'github-pat-credential-id',
+                    branch: 'main'
+                )
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t $DOCKER_IMAGE .'
+                    docker.build("${IMAGE_NAME}")
                 }
             }
         }
@@ -23,7 +29,8 @@ pipeline {
         stage('Run Container') {
             steps {
                 script {
-                    sh 'docker run -d -p 5000:5000 $DOCKER_IMAGE'
+                    sh "docker rm -f ${CONTAINER_NAME} || true"
+                    sh "docker run -d --name ${CONTAINER_NAME} -p 5000:5000 ${IMAGE_NAME}"
                 }
             }
         }
